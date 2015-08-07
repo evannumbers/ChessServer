@@ -1,0 +1,103 @@
+<html>
+	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+	<style>
+	html{
+		-webkit-touch-callout: none;
+	    -webkit-user-select: none;
+	    -khtml-user-select: none;
+	    -moz-user-select: none;
+	    -ms-user-select: none;
+	    user-select: none;
+	    cursor: default;
+	}
+	table{
+		margin: 5% auto;
+		border-collapse: collapse;
+		border-style: solid;
+		border-color: #000;
+	}
+	td{
+		font-size: 36pt;
+		text-align: center;
+		width: 75px;
+		height: 75px;
+	}
+	tr:nth-child(even) td:nth-child(even), tr:nth-child(odd) td:nth-child(odd){
+		background-color: #e5c8a0;
+	}
+	tr:nth-child(odd) td:nth-child(even), tr:nth-child(even) td:nth-child(odd){
+		background-color: #bf9b69;
+	}
+	span.black{
+		color: black;
+	    text-shadow:
+	    -1px -1px 0 #FFF,
+	    1px -1px 0 #FFF,
+	    -1px 1px 0 #FFF,
+	    1px 1px 0 #FFF;
+	}
+	span.white{
+		color: white;
+	    text-shadow:
+	    -1px -1px 0 #000,
+	    1px -1px 0 #000,
+	    -1px 1px 0 #000,
+	    1px 1px 0 #000;
+	}
+	div{
+		width: 100%;
+		text-align: center;
+		font-size: 16pt;
+	}
+	</style>
+	<body>
+		<table id="board">
+		</table>
+		<div>
+			White Wins: <span class="whitescore">0</span><br>
+			Black Wins: <span class="blackscore">0</span><br>
+			Draws: <span class="draws">0</span><br>
+		</div>
+	</body>
+	<script>
+		var socket = io();
+		pieceLookup = {K: '<span class="white">&#9818;</span>',
+					   Q: '<span class="white">&#9819;</span>',
+					   R: '<span class="white">&#9820;</span>',
+					   B: '<span class="white">&#9821;</span>',
+					   N: '<span class="white">&#9822;</span>',
+					   P: '<span class="white">&#9823;</span>',
+					   k: '<span class="black">&#9818;</span>',
+					   q: '<span class="black">&#9819;</span>',
+					   r: '<span class="black">&#9820;</span>',
+					   b: '<span class="black">&#9821;</span>',
+					   n: '<span class="black">&#9822;</span>',
+					   p: '<span class="black">&#9823;</span>',
+					   '.': ''}
+		function newBoard(){
+			$('#board').empty();
+			for(var i=0; i<8; i++){
+				var newRow = '<tr id="'+i+'">';
+				for(var j=0; j<8; j++){
+					newRow += '<td id="'+j+'"></td>';
+				}
+				newRow += '</tr>';
+				$('#board').append(newRow);
+			}
+		}
+		function setPiece(r,c,piece){
+			$('#board tr#'+r+' td#'+c).html(pieceLookup[piece]);
+		}
+		function setScore(player,score){
+			$('.'+player).text(score);
+		}
+		newBoard();
+		socket.on('setPiece', function(data){
+			setPiece(data.r, data.c, data.piece);
+		});
+		socket.on('setScore', function(data){
+			setScore(data.player, data.score);
+		});
+	</script>
+</html>
